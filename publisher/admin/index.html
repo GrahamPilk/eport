@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Editor</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/admin/site.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <script src="/admin/admin.js" defer></script>
+</head>
+<body>
+  <!-- ── login ── -->
+  <main id="login" class="login" hidden>
+    <form class="login-card" novalidate>
+      <div class="login-head">
+        <span class="mark px" aria-hidden="true">GP</span>
+        <div>
+          <h1>Editor</h1>
+          <p class="px">Owner only</p>
+        </div>
+      </div>
+      <label class="field">
+        <span class="px">Password</span>
+        <input name="password" type="password" autocomplete="current-password" required />
+      </label>
+      <label class="field" id="code-field">
+        <span class="px">2FA code</span>
+        <input name="code" type="text" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" autocomplete="one-time-code" required />
+      </label>
+      <p class="error" role="alert" aria-live="assertive"></p>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+  </main>
+
+  <!-- ── app ── -->
+  <div id="app" class="app" hidden>
+    <header class="bar">
+      <a class="brand" href="/" target="_blank" rel="noopener"><span class="mark px" aria-hidden="true">GP</span><span class="px">Editor</span></a>
+      <p class="build px" aria-live="polite"><span class="led" aria-hidden="true"></span><span class="build-text">Ready</span></p>
+      <button class="link px" type="button" data-action="logout">Log out</button>
+    </header>
+
+    <aside class="list" aria-label="Posts">
+      <button class="btn new" type="button" data-action="new">+ New post</button>
+      <ol class="posts" role="list"></ol>
+    </aside>
+
+    <main class="editor" aria-label="Editor">
+      <div class="empty">
+        <p class="px">No post open</p>
+        <p>Pick a post on the left, or start a new one.</p>
+      </div>
+
+      <form class="doc" hidden novalidate>
+        <button class="back px" type="button" data-action="back">← Posts</button>
+        <div class="restore" hidden role="status">
+          <span>You have unsaved changes from earlier on this device.</span>
+          <button type="button" class="link px" data-action="restore">Restore</button>
+          <button type="button" class="link px" data-action="discard">Discard</button>
+        </div>
+
+        <label class="sr-only" for="f-title">Title</label>
+        <textarea id="f-title" name="title" class="title" rows="1" placeholder="Title" required></textarea>
+
+        <details class="meta" open>
+          <summary class="px">Details</summary>
+          <div class="meta-grid">
+            <label class="field"><span class="px">Slug</span><input name="slug" spellcheck="false" autocapitalize="off" placeholder="auto from title" /></label>
+            <label class="field"><span class="px">Date</span><input name="date" type="date" /></label>
+            <label class="field"><span class="px">Tags</span><input name="tags" placeholder="design, nfc" autocapitalize="off" /></label>
+            <label class="field wide"><span class="px">Description</span><textarea name="description" rows="2" placeholder="One line for lists, RSS and link previews"></textarea></label>
+          </div>
+        </details>
+
+        <div class="toolbar" role="toolbar" aria-label="Formatting">
+          <button type="button" data-md="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+          <button type="button" data-md="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+          <button type="button" data-md="h2" title="Heading">H2</button>
+          <button type="button" data-md="link" title="Link (Ctrl+K)">Link</button>
+          <button type="button" data-md="quote" title="Quote">“ ”</button>
+          <button type="button" data-md="list" title="List">• List</button>
+          <button type="button" data-md="code" title="Code">{ }</button>
+          <label class="upload" title="Insert image">
+            <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden />
+            <span>Image</span>
+          </label>
+          <label class="dither px" title="Convert uploads to 1-bit dither"><input type="checkbox" checked /> 1-bit</label>
+          <span class="spacer"></span>
+          <div class="tabs" role="tablist">
+            <button type="button" role="tab" aria-selected="true" data-tab="write" class="px">Write</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="preview" class="px">Preview</button>
+          </div>
+        </div>
+
+        <div class="panes" data-view="write">
+          <label class="sr-only" for="f-body">Body (Markdown)</label>
+          <textarea id="f-body" name="body" class="body" placeholder="Write in Markdown…" spellcheck="true"></textarea>
+          <iframe class="preview" title="Preview" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+        </div>
+
+        <footer class="actions">
+          <button type="button" class="link danger px" data-action="delete">Delete</button>
+          <p class="status px" aria-live="polite"></p>
+          <button type="button" class="btn ghost" data-action="draft">Save draft</button>
+          <button type="button" class="btn" data-action="publish">Publish</button>
+        </footer>
+      </form>
+    </main>
+  </div>
+</body>
+</html>

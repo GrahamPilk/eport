@@ -8,7 +8,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "dither": "node scripts/dither.mjs",
-    "publisher": "node publisher/server.mjs"
+    "publisher": "node publisher/server.mjs",
+    "admin:setup": "node publisher/setup.mjs",
+    "admin:dev": "INSECURE_COOKIE=1 SERVE_STATIC=1 RELEASES=.local node --env-file-if-exists=.env publisher/server.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

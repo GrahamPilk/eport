@@ -14,8 +14,8 @@ const d = entry.data;
     <div><dt class="px">Role</dt><dd>{d.role}</dd></div>
     <div><dt class="px">Year</dt><dd>{d.year}</dd></div>
     {d.stack.length > 0 && <div><dt class="px">Stack</dt><dd>{d.stack.join(', ')}</dd></div>}
-    {(d.url || d.repo) && <div><dt class="px">Links</dt><dd>
-      {d.url && <a href={d.url}>Live ↗</a>} {d.repo && <a href={d.repo}>Source ↗</a>}
+    {(d.url || d.repo || d.appStore) && <div><dt class="px">Links</dt><dd>
+      {d.url && <a href={d.url}>Website ↗</a>} {d.appStore && <a href={d.appStore}>App Store ↗</a>} {d.repo && <a href={d.repo}>Source ↗</a>}
     </dd></div>}
   </dl>
   <article class="prose"><Content /></article>

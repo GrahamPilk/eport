@@ -24,6 +24,7 @@ const work = defineCollection({
     stack: z.array(z.string()).default([]),
     url: z.string().url().optional(),
     repo: z.string().url().optional(),
+    appStore: z.string().url().optional(),
     order: z.number().default(100),
     featured: z.boolean().default(true),
   }),
