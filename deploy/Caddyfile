@@ -1,11 +1,11 @@
-# /etc/caddy/Caddyfile  — replace example.com with your domain
+# /etc/caddy/Caddyfile  — replace grahampilkington.com with your domain
 # TLS: Cloudflare Origin Certificate (SSL/TLS → Origin Server → Create certificate),
 # saved to the two paths below. Cloudflare SSL mode: Full (strict).
-example.com, www.example.com {
+grahampilkington.com, www.grahampilkington.com {
 	tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin.key
 
-	@www host www.example.com
-	redir @www https://example.com{uri} 308
+	@www host www.grahampilkington.com
+	redir @www https://grahampilkington.com{uri} 308
 
 	encode zstd gzip
 
@@ -14,13 +14,22 @@ example.com, www.example.com {
 		X-Content-Type-Options nosniff
 		Referrer-Policy strict-origin-when-cross-origin
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'"
 		-Server
+	}
+	# the editor sets its own stricter CSP; everything else gets this one
+	@site not path /admin*
+	header @site {
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'"
 	}
 	header /_astro/* Cache-Control "public, max-age=31536000, immutable"
 	header /fonts/* Cache-Control "public, max-age=31536000, immutable"
 
-	handle /api/* {
+	# publish server: editor UI + API (Cloudflare passes the real IP in CF-Connecting-IP)
+	@publisher path /api/* /admin /admin/*
+	handle @publisher {
+		request_body /api/uploads* {
+			max_size 15MB
+		}
 		reverse_proxy 127.0.0.1:8787
 	}
 
