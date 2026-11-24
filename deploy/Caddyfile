@@ -1,0 +1,38 @@
+# /etc/caddy/Caddyfile  — replace example.com with your domain
+# TLS: Cloudflare Origin Certificate (SSL/TLS → Origin Server → Create certificate),
+# saved to the two paths below. Cloudflare SSL mode: Full (strict).
+example.com, www.example.com {
+	tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin.key
+
+	@www host www.example.com
+	redir @www https://example.com{uri} 308
+
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'"
+		-Server
+	}
+	header /_astro/* Cache-Control "public, max-age=31536000, immutable"
+	header /fonts/* Cache-Control "public, max-age=31536000, immutable"
+
+	handle /api/* {
+		reverse_proxy 127.0.0.1:8787
+	}
+
+	handle {
+		root * /srv/site/current
+		try_files {path} {path}/index.html {path}.html
+		file_server
+	}
+
+	handle_errors {
+		root * /srv/site/current
+		rewrite * /404.html
+		file_server
+	}
+}

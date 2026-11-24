@@ -1,0 +1,20 @@
+{
+  "name": "site",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "dither": "node scripts/dither.mjs",
+    "publisher": "node publisher/server.mjs"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.6",
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource/silkscreen": "^5.3.0",
+    "astro": "^7.4.13"
+  }
+}

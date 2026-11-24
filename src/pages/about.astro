@@ -1,0 +1,34 @@
+---
+import Page from '../layouts/Page.astro';
+import { SITE } from '../site.config.mjs';
+---
+<Page title="About" kicker={SITE.location} description={`About ${SITE.name}.`}>
+  <div class="about">
+    <div class="prose">
+      <p class="big">{SITE.tagline}</p>
+      <p>Placeholder bio. Two or three short paragraphs: what you do, what you're into right now, and what you'd like to be asked about. Write it like you'd say it to someone who just tapped your card.</p>
+      <p>Placeholder paragraph two. A specific detail beats an adjective: "I rebuilt my dad's lathe controller" says more than "passionate maker".</p>
+      <h2>Now</h2>
+      <ul>
+        <li>Placeholder: what you're building this month</li>
+        <li>Placeholder: what you're learning</li>
+        <li>Placeholder: what you're reading</li>
+      </ul>
+    </div>
+    <aside>
+      <h2 class="px">Elsewhere</h2>
+      <ul class="links">
+        {SITE.links.map((l) => <li><a href={l.href} rel={l.href.startsWith('http') ? 'me noopener' : undefined}>{l.label} <span aria-hidden="true">↗</span></a></li>)}
+      </ul>
+    </aside>
+  </div>
+</Page>
+<style>
+  .about { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: calc(var(--u) * 6); }
+  .big { font-size: var(--step-2); line-height: 1.3; letter-spacing: -0.01em; }
+  aside h2 { margin: 0 0 12px; font-weight: 400; }
+  .links { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--ink); }
+  .links a { display: flex; justify-content: space-between; padding: 14px 4px; border-bottom: 1px solid var(--ink); text-decoration: none; font-weight: 700; }
+  .links a:hover { background: var(--ink); color: var(--paper); }
+  @media (max-width: 760px) { .about { grid-template-columns: 1fr; } }
+</style>

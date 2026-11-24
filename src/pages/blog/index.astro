@@ -1,0 +1,9 @@
+---
+import Page from '../../layouts/Page.astro';
+import PostList from '../../components/PostList.astro';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => +b.data.date - +a.data.date);
+---
+<Page title="Writing" kicker={`${posts.length} posts · RSS at /rss.xml`} description="Notes, build logs and essays.">
+  <PostList posts={posts} />
+</Page>

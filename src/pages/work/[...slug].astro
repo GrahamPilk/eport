@@ -1,0 +1,31 @@
+---
+import Page from '../../layouts/Page.astro';
+import { getCollection, render } from 'astro:content';
+export async function getStaticPaths() {
+  return (await getCollection('work')).map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+<Page title={d.title} kicker={`Work · ${d.year}`} description={d.summary} type="article">
+  <p slot="head" class="lede">{d.summary}</p>
+  <dl class="facts" slot="head">
+    <div><dt class="px">Role</dt><dd>{d.role}</dd></div>
+    <div><dt class="px">Year</dt><dd>{d.year}</dd></div>
+    {d.stack.length > 0 && <div><dt class="px">Stack</dt><dd>{d.stack.join(', ')}</dd></div>}
+    {(d.url || d.repo) && <div><dt class="px">Links</dt><dd>
+      {d.url && <a href={d.url}>Live ↗</a>} {d.repo && <a href={d.repo}>Source ↗</a>}
+    </dd></div>}
+  </dl>
+  <article class="prose"><Content /></article>
+  <p class="back"><a class="px" href="/work">← All work</a></p>
+</Page>
+<style>
+  .lede { font-size: var(--step-1); max-width: 40ch; margin: 16px 0 0; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; margin: 32px 0 0; border-top: 2px solid var(--ink); }
+  .facts div { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--ink); }
+  dt { margin-bottom: 4px; }
+  dd { margin: 0; }
+  .back { margin-top: 64px; }
+</style>

@@ -1,0 +1,98 @@
+---
+import Base from '../layouts/Base.astro';
+import DitherField from '../components/DitherField.astro';
+import WorkList from '../components/WorkList.astro';
+import PostList from '../components/PostList.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '../site.config.mjs';
+
+const work = (await getCollection('work', ({ data }) => data.featured)).sort((a, b) => a.data.order - b.data.order).slice(0, 4);
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => +b.data.date - +a.data.date).slice(0, 3);
+const email = SITE.email;
+---
+<Base intro>
+  <section class="hero wrap" aria-labelledby="hi">
+    <div class="copy">
+      <p class="px strip" data-rv style="--i:0">
+        {SITE.status && <span class="dot" aria-hidden="true"></span>}
+        {SITE.status && <span>{SITE.status}</span>}
+        <span>{SITE.location}</span>
+        <span data-card hidden></span>
+      </p>
+      <h1 id="hi" data-rv style="--i:1">{SITE.name}<span class="cursor" aria-hidden="true"></span></h1>
+      <p class="lead" data-rv style="--i:2">{SITE.tagline}</p>
+      <p class="role px" data-rv style="--i:3">{SITE.role}</p>
+      <div class="cta" data-rv style="--i:4">
+        <a class="btn" href={`mailto:${email}`}>Get in touch</a>
+        <a class="btn ghost" href="/work">See the work</a>
+      </div>
+    </div>
+    <div data-rv style="--i:3"><DitherField label="A dithered sphere lit by your pointer" /></div>
+  </section>
+
+  <section class="wrap block" aria-labelledby="sec-work">
+    <div class="sec-head"><span class="px">01</span><h2 id="sec-work">Selected work</h2><a class="px more" href="/work">All work →</a></div>
+    <WorkList items={work} />
+  </section>
+
+  <section class="wrap block split" aria-labelledby="sec-writing">
+    <div class="sec-head"><span class="px">02</span><h2 id="sec-writing">Writing</h2><a class="px more" href="/blog">Archive →</a></div>
+    <PostList posts={posts} />
+  </section>
+
+  <section class="wrap block" aria-labelledby="sec-hello">
+    <div class="hello">
+      <div class="d50 hello-bg" aria-hidden="true"></div>
+      <div class="hello-in">
+        <p class="px">03 — Contact</p>
+        <h2 id="sec-hello">Got a card? Then we've met.<br />Let's keep talking.</h2>
+        <a class="btn inv" href={`mailto:${email}`}>{email}</a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    // NFC cards encode ?c=07 — greet the card that was tapped.
+    (() => {
+      const c = new URLSearchParams(location.search).get('c');
+      const el = document.querySelector('[data-card]');
+      if (!c || !el || !/^[\w-]{1,12}$/.test(c)) return;
+      el.textContent = 'Card ' + c + ' · thanks for tapping';
+      el.hidden = false;
+    })();
+  </script>
+</Base>
+
+<style>
+  .hero {
+    display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: calc(var(--u) * 4); align-items: center;
+    padding-block: calc(var(--u) * 6) calc(var(--u) * 10);
+  }
+  .strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin: 0 0 calc(var(--u) * 3); }
+  .strip [data-card] { background: var(--ink); color: var(--paper); padding: 2px 6px; }
+  .dot { width: 8px; height: 8px; background: var(--ink); margin-right: -10px; animation: blink 1.2s steps(1) infinite; }
+  h1 { font-size: var(--step-4); line-height: 0.95; letter-spacing: -0.045em; margin: 0; font-weight: 700; }
+  .cursor { display: inline-block; width: 0.12em; height: 0.8em; margin-left: 0.08em; background: var(--ink); vertical-align: -0.04em; animation: blink 1s steps(1) infinite; }
+  .lead { font-size: var(--step-2); line-height: 1.3; letter-spacing: -0.01em; margin: calc(var(--u) * 3) 0 0; max-width: 24ch; }
+  .role { margin: calc(var(--u) * 2) 0 0; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: calc(var(--u) * 4); }
+  .btn {
+    display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; font-weight: 700; text-decoration: none;
+    background: var(--ink); color: var(--paper); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); margin: 0 4px 4px 0;
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+  .btn:active { transform: translate(4px, 4px); box-shadow: none; }
+  .btn.ghost { background: var(--paper); color: var(--ink); }
+  .block { margin-top: calc(var(--u) * 10); }
+  .hello { position: relative; border: 2px solid var(--ink); }
+  .hello-bg { position: absolute; inset: 0; }
+  .hello-in { position: relative; margin: clamp(16px, 5vw, 56px); padding: clamp(24px, 5vw, 56px); background: var(--paper); border: 2px solid var(--ink); }
+  .hello h2 { font-size: var(--step-3); line-height: 1.08; letter-spacing: -0.03em; margin: 12px 0 calc(var(--u) * 4); }
+  .hello .px { margin: 0; }
+  .btn.inv { word-break: break-all; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .dot, .cursor { animation: none; } }
+  @media (max-width: 760px) {
+    .hero { grid-template-columns: 1fr; padding-block: calc(var(--u) * 3) calc(var(--u) * 6); gap: calc(var(--u) * 5); }
+  }
+</style>

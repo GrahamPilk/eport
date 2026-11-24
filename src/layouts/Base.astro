@@ -1,0 +1,130 @@
+---
+import '../styles/global.css';
+import Intro from '../components/Intro.astro';
+import { SITE } from '../site.config.mjs';
+
+interface Props { title?: string; description?: string; intro?: boolean; type?: 'website' | 'article'; }
+const { title, description = SITE.tagline, intro = false, type = 'website' } = Astro.props;
+const fullTitle = title ? `${title} — ${SITE.name}` : `${SITE.name} — ${SITE.role}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { href: '/work', label: 'Work' },
+  { href: '/blog', label: 'Writing' },
+  { href: '/about', label: 'About' },
+];
+const isActive = (href: string) => path === href || path.startsWith(href + '/');
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta property="og:type" content={type} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+  <link rel="preload" href="/fonts/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/silkscreen-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <script is:inline define:vars={{ intro }}>
+    (() => {
+      const d = document.documentElement;
+      try { const t = localStorage.getItem('theme'); if (t) d.dataset.theme = t; } catch (e) {}
+      if (!intro) return;
+      let seen = false; try { seen = !!sessionStorage.getItem('intro'); } catch (e) {}
+      const q = new URLSearchParams(location.search);
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduce && (!seen || q.has('intro'))) d.classList.add('intro');
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link px" href="#main">Skip to content</a>
+  {intro && <Intro />}
+  <header class="site-head wrap">
+    <a class="brand" href="/" aria-label={`${SITE.name}, home`}>
+      <span class="mono px" aria-hidden="true">{SITE.short}</span>
+      <span class="brand-name">{SITE.name}</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul>
+        {nav.map((n) => (
+          <li><a class="px" href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <button class="invert px" type="button" aria-pressed="false" title="Invert colours">
+      <span class="invert-ico" aria-hidden="true"></span><span class="sr-only">Invert colours</span>
+    </button>
+  </header>
+
+  <main id="main">
+    <slot />
+  </main>
+
+  <footer class="site-foot">
+    <div class="rule" aria-hidden="true"><span></span><span class="d75"></span><span class="d50"></span><span class="d25"></span></div>
+    <div class="wrap foot-grid">
+      <p class="px">© {new Date().getFullYear()} {SITE.name}</p>
+      <ul class="foot-links">
+        {SITE.links.map((l) => <li><a href={l.href} rel={l.href.startsWith('http') ? 'me noopener' : undefined}>{l.label}</a></li>)}
+      </ul>
+      <p class="px foot-note">1 bit · 0 trackers · <a href="#main">Top ↑</a></p>
+    </div>
+  </footer>
+
+  <script is:inline>
+    (() => {
+      const d = document.documentElement, b = document.querySelector('.invert');
+      const dark = () => d.dataset.theme ? d.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      const sync = () => b.setAttribute('aria-pressed', String(dark()));
+      sync();
+      b.addEventListener('click', () => {
+        d.dataset.theme = dark() ? 'light' : 'dark';
+        try { localStorage.setItem('theme', d.dataset.theme); } catch (e) {}
+        sync(); dispatchEvent(new Event('themechange'));
+      });
+    })();
+  </script>
+</body>
+</html>
+
+<style>
+  .site-head {
+    display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: calc(var(--u) * 2);
+    padding-block: calc(var(--u) * 2.5);
+  }
+  .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 700; }
+  .mono { display: grid; place-items: center; width: 32px; height: 32px; background: var(--ink); color: var(--paper); font-size: 0.8rem; letter-spacing: 0; }
+  .brand:hover .mono { background: var(--paper); color: var(--ink); outline: 2px solid var(--ink); outline-offset: -2px; }
+  .brand-name { font-size: 1.05rem; letter-spacing: -0.01em; }
+  nav ul { display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+  nav a { display: block; padding: 10px 10px; text-decoration: none; }
+  nav a:hover { outline: 2px solid var(--ink); outline-offset: -2px; }
+  nav a[aria-current='page'] { background: var(--ink); color: var(--paper); }
+  .invert { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }
+  .invert-ico { width: 20px; height: 20px; border: 2px solid var(--ink); background: linear-gradient(90deg, var(--ink) 50%, transparent 50%); }
+  .invert:hover .invert-ico { transform: rotate(180deg); }
+  @media (max-width: 560px) {
+    .brand-name { display: none; }
+    nav a { padding: 10px 8px; }
+  }
+  .site-foot { margin-top: calc(var(--u) * 12); }
+  .foot-grid { display: grid; grid-template-columns: 1fr auto; gap: calc(var(--u) * 2); padding-block: calc(var(--u) * 4); align-items: baseline; }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 8px 20px; list-style: none; margin: 0; padding: 0; grid-row: span 2; justify-self: end; }
+  .foot-grid p { margin: 0; }
+  .foot-note a { text-decoration: none; }
+  @media (max-width: 560px) {
+    .foot-grid { grid-template-columns: 1fr; }
+    .foot-links { justify-self: start; grid-row: auto; order: -1; }
+  }
+</style>

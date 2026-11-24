@@ -1,0 +1,19 @@
+# /etc/systemd/system/site-publisher.service
+[Unit]
+Description=Site publish API
+After=network-online.target
+
+[Service]
+User=site
+WorkingDirectory=/home/site/site
+EnvironmentFile=/etc/site-publisher.env
+Environment=SITE_DIR=/home/site/site RELEASES=/srv/site PORT=8787
+ExecStart=/usr/bin/node publisher/server.mjs
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/home/site /srv/site
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

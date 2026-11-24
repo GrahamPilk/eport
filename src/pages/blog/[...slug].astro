@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+export async function getStaticPaths() {
+  return (await getCollection('blog', ({ data }) => !data.draft)).map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const d = entry.data;
+const fmt = (x: Date) => x.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const words = (entry.body ?? '').split(/\s+/).length;
+---
+<Base title={d.title} description={d.description} type="article">
+  <article class="wrap post">
+    <header>
+      <p class="px"><a href="/blog">Writing</a> / <time datetime={d.date.toISOString()}>{fmt(d.date)}</time> · {Math.max(1, Math.round(words / 230))} min</p>
+      <h1>{d.title}</h1>
+      {d.description && <p class="lede">{d.description}</p>}
+      {d.tags.length > 0 && <ul class="tags" aria-label="Tags">{d.tags.map((t) => <li class="px">{t}</li>)}</ul>}
+    </header>
+    <div class="rule" aria-hidden="true"><span></span><span class="d75"></span><span class="d50"></span><span class="d25"></span></div>
+    <div class="prose body"><Content /></div>
+    <p class="back"><a class="px" href="/blog">← All writing</a></p>
+  </article>
+</Base>
+<style>
+  .post header { padding-block: calc(var(--u) * 6) calc(var(--u) * 4); max-width: 46rem; }
+  .post header .px { margin: 0; }
+  .post header a { text-decoration: none; }
+  h1 { font-size: var(--step-3); line-height: 1.05; letter-spacing: -0.03em; margin: 12px 0 0; }
+  .lede { font-size: var(--step-1); margin: 16px 0 0; max-width: 40ch; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 20px 0 0; }
+  .tags li { border: 1px solid var(--ink); padding: 2px 8px; }
+  .body { margin-top: calc(var(--u) * 5); }
+  .back { margin-top: 64px; }
+</style>

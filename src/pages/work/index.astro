@@ -1,0 +1,9 @@
+---
+import Page from '../../layouts/Page.astro';
+import WorkList from '../../components/WorkList.astro';
+import { getCollection } from 'astro:content';
+const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+---
+<Page title="Work" kicker={`${work.length} projects`} description="Selected projects and case studies.">
+  <WorkList items={work} />
+</Page>

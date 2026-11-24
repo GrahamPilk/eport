@@ -1,0 +1,18 @@
+---
+import Base from './Base.astro';
+interface Props { title: string; kicker?: string; description?: string; type?: 'website' | 'article'; }
+const { title, kicker, description, type } = Astro.props;
+---
+<Base title={title} description={description} type={type}>
+  <header class="wrap page-head">
+    {kicker && <p class="px">{kicker}</p>}
+    <h1>{title}</h1>
+    <slot name="head" />
+  </header>
+  <div class="wrap"><slot /></div>
+</Base>
+<style>
+  .page-head { padding-block: calc(var(--u) * 6) calc(var(--u) * 5); }
+  .page-head h1 { font-size: var(--step-4); line-height: 0.98; letter-spacing: -0.04em; margin: 8px 0 0; max-width: 18ch; }
+  .page-head .px { margin: 0; }
+</style>
